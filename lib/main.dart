@@ -7,26 +7,31 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: "Hello You",
-      home: HelloYou(),
+      title: "Trip Cost Calculator",
+      home: FuelForm(),
     );
   }
 }
 
-class HelloYou extends StatefulWidget {
+class FuelForm extends StatefulWidget {
   @override
-  State<StatefulWidget> createState() => _HelloYouState();
+  State<StatefulWidget> createState() => _FuelFormState();
 }
 
-class _HelloYouState extends State<HelloYou> {
+class _FuelFormState extends State<FuelForm> {
 
-  String name = '';
-
-  final _currencies = ['USD', 'EUR', 'GBP', 'SEK'];     // This list will be used for displaying as dropdown items.
+  String result = '';
   String _currency = 'SEK';     // This will be used as the default dropdown item/currency.
+  final _currencies = ['USD', 'EUR', 'GBP', 'SEK'];     // This list will be used for displaying as dropdown items.
+  final distanceController = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
+
+    // refer more TextTheme here: https://docs.flutter.io/flutter/material/TextTheme-class.html
+    TextStyle textStyle = Theme.of(context).textTheme.title;
+
     return Scaffold (
       appBar: AppBar(
         title: Text("Hello"),
@@ -37,20 +42,23 @@ class _HelloYouState extends State<HelloYou> {
         child: Column(
           children: <Widget>[
 
+
             TextField(
-              decoration: InputDecoration(hintText: 'Please enter your name'),
-              onSubmitted: (String string) {
-                setState(() {
-                  // Assigning the value Entered in the TextField to the 'name' variable
-                  name = string;
-                });
-              },
+              // Setting the Controller for this TestField to 'distanceController'
+              controller: distanceController,
+              decoration: InputDecoration(
+                hintText: 'Please enter your name',
+                labelText: 'Distance',
+                labelStyle: textStyle,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(5.0),
+                )
+              ),
+              keyboardType: TextInputType.number,
             ),
 
-            Text('Hello ' + name + '!'),
 
             DropdownButton<String> (
-
               // value --> It will be used as the currently selected item, or null if no item has been selected.
               value: _currency,
 
@@ -62,12 +70,31 @@ class _HelloYouState extends State<HelloYou> {
                 );
               }).toList(),
 
-
               // If 'value' is null then the menu is popped up as if the first item was selected.
               onChanged: (String newValue) {
                 _onDropDownChanged(newValue);
               },
             ),
+
+            RaisedButton(
+              color: Theme.of(context).primaryColorDark,
+              textColor: Theme.of(context).primaryColorLight,
+              onPressed: () {
+                setState(() {
+                  result = distanceController.text;
+                });
+              },
+
+              // Text to display on 'Button' widget
+              child: Text(
+                'Submit',
+                // 'textScaleFactor' is used to change the text size
+                textScaleFactor: 1.5,
+              ),
+            ),
+
+            Text(result),
+
           ],
         ),
       ),
