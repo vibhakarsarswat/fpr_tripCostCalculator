@@ -26,6 +26,7 @@ class _FuelFormState extends State<FuelForm> {
   TextEditingController distanceController = TextEditingController();
   TextEditingController avgController = TextEditingController();
   TextEditingController priceController = TextEditingController();
+  final FocusNode _focusNode = new FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +47,7 @@ class _FuelFormState extends State<FuelForm> {
             Padding(
               padding: const EdgeInsets.all(5.0),
               child: TextField(
+                autofocus: true,
                 // Setting the Controller for this TestField to 'Controller'
                 controller: distanceController,
                 decoration: InputDecoration(
@@ -82,6 +84,7 @@ class _FuelFormState extends State<FuelForm> {
               child: Row(children: <Widget>[
                 Expanded(
                   child: TextField(
+                    focusNode: _focusNode,
                     // Setting the Controller for this TestField to 'averageController'
                     controller: priceController,
                     decoration: InputDecoration(
@@ -121,7 +124,6 @@ class _FuelFormState extends State<FuelForm> {
               ]),
             ),
 
-
             Row(
               children: <Widget>[
 
@@ -150,6 +152,7 @@ class _FuelFormState extends State<FuelForm> {
                       setState(() {
                         _reset();
                       });
+                      _focusNode.unfocus();
                     },
 
                     // Text to display on 'Button' widget
@@ -201,4 +204,7 @@ class _FuelFormState extends State<FuelForm> {
       result = '';
     });
   }
+
+
+
 }
