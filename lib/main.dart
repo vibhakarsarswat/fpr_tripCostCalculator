@@ -22,9 +22,10 @@ class _FuelFormState extends State<FuelForm> {
 
   String result = '';
   String _currency = 'SEK';     // This will be used as the default dropdown item/currency.
-  final _currencies = ['USD', 'EUR', 'GBP', 'SEK'];     // This list will be used for displaying as dropdown items.
-  final distanceController = TextEditingController();
-
+  final _currencies = ['USD', 'EUR', 'GBP', 'SEK', 'INR'];     // This list will be used for displaying as dropdown items.
+  TextEditingController distanceController = TextEditingController();
+  TextEditingController avgController = TextEditingController();
+  TextEditingController priceController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -42,58 +43,126 @@ class _FuelFormState extends State<FuelForm> {
         child: Column(
           children: <Widget>[
 
-
-            TextField(
-              // Setting the Controller for this TestField to 'distanceController'
-              controller: distanceController,
-              decoration: InputDecoration(
-                hintText: 'Please enter your name',
-                labelText: 'Distance',
-                labelStyle: textStyle,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(5.0),
-                )
-              ),
-              keyboardType: TextInputType.number,
-            ),
-
-
-            DropdownButton<String> (
-              // value --> It will be used as the currently selected item, or null if no item has been selected.
-              value: _currency,
-
-              // items --> represents the LIST of all the items for the DropDown
-              items: _currencies.map((String currentvalue){
-                return DropdownMenuItem<String>(
-                  value: currentvalue,
-                  child: Text(currentvalue),
-                );
-              }).toList(),
-
-              // If 'value' is null then the menu is popped up as if the first item was selected.
-              onChanged: (String newValue) {
-                _onDropDownChanged(newValue);
-              },
-            ),
-
-            RaisedButton(
-              color: Theme.of(context).primaryColorDark,
-              textColor: Theme.of(context).primaryColorLight,
-              onPressed: () {
-                setState(() {
-                  result = distanceController.text;
-                });
-              },
-
-              // Text to display on 'Button' widget
-              child: Text(
-                'Submit',
-                // 'textScaleFactor' is used to change the text size
-                textScaleFactor: 1.5,
+            Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: TextField(
+                // Setting the Controller for this TestField to 'Controller'
+                controller: distanceController,
+                decoration: InputDecoration(
+                    labelText: 'Total Distance Travelled',
+                    hintText: 'e.g. 147',
+                    labelStyle: textStyle,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    )
+                ),
+                keyboardType: TextInputType.number,
               ),
             ),
 
-            Text(result),
+            Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: TextField(
+                // Setting the Controller for this TestField to 'distanceController'
+                controller: avgController,
+                decoration: InputDecoration(
+                    labelText: 'Mileage - Consumption per Unit',
+                    hintText: 'e.g. 17',
+                    labelStyle: textStyle,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(5.0),
+                    )
+                ),
+                keyboardType: TextInputType.number,
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Row(children: <Widget>[
+                Expanded(
+                  child: TextField(
+                    // Setting the Controller for this TestField to 'averageController'
+                    controller: priceController,
+                    decoration: InputDecoration(
+                        labelText: 'Fuel Price Per Unit',
+                        hintText: 'e.g. 74',
+                        labelStyle: textStyle,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5.0),
+                        )
+                    ),
+                    keyboardType: TextInputType.number,
+                  ),
+                ),
+
+                Container(width: 10.0),
+
+                Expanded(
+                  child: DropdownButton<String> (
+
+                    // value --> It will be used as the currently selected item, or null if no item has been selected.
+                    value: _currency,
+
+                    // items --> represents the LIST of all the items for the DropDown
+                    items: _currencies.map((String currentvalue){
+                      return DropdownMenuItem<String>(
+                        value: currentvalue,
+                        child: Text(currentvalue),
+                      );
+                    }).toList(),
+
+                    // If 'value' is null then the menu is popped up as if the first item was selected.
+                    onChanged: (String newValue) {
+                      _onDropDownChanged(newValue);
+                    },
+                  ),
+                ),
+              ]),
+            ),
+
+
+            Row(
+              children: <Widget>[
+
+                Expanded(child: RaisedButton(
+                    color: Theme.of(context).primaryColorDark,
+                    textColor: Theme.of(context).primaryColorLight,
+                    onPressed: () {
+                      setState(() {
+                        result = _calculateTotalCost();
+                      });
+                    },
+
+                    // Text to display on 'Button' widget
+                    child: Text(
+                      'Submit',
+                      // 'textScaleFactor' is used to change the text size
+                      textScaleFactor: 1.5,
+                    ),),),
+
+                Expanded(child: RaisedButton(
+                    color: Theme.of(context).buttonColor,
+                    textColor: Theme.of(context).primaryColorDark,
+                    onPressed: () {
+                      setState(() {
+                        _reset();
+                      });
+                    },
+
+                    // Text to display on 'Button' widget
+                    child: Text(
+                      'Reset',
+                      // 'textScaleFactor' is used to change the text size
+                      textScaleFactor: 1.5,
+                    ),),),
+              ],
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: Text(result),
+            ),
 
           ],
         ),
@@ -101,9 +170,30 @@ class _FuelFormState extends State<FuelForm> {
     );
   }
 
-  _onDropDownChanged(String newValue) {
+  void _onDropDownChanged(String newValue) {
     setState(() {
       this._currency = newValue;
     });
+  }
+
+  String _calculateTotalCost() {
+
+    double _distanceTravelled = double.parse(distanceController.text);
+    double _averageConsumption = double.parse(avgController.text);
+    double _fuelPricePeeUnit = double.parse(priceController.text);
+
+    double _totalTripCost = _distanceTravelled / _averageConsumption * _fuelPricePeeUnit;
+
+    String _result = 'The total cost of your Trip is: ${_totalTripCost.toStringAsFixed(2)} $_currency';
+
+    return _result;
+  }
+
+  void _reset() {
+    distanceController.clear();
+    avgController.clear();
+    priceController.clear();
+    setState(() {
+      result = '';    });
   }
 }
