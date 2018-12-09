@@ -139,7 +139,9 @@ class _FuelFormState extends State<FuelForm> {
                       'Submit',
                       // 'textScaleFactor' is used to change the text size
                       textScaleFactor: 1.5,
-                    ),),),
+                    ),
+                  ),
+                ),
 
                 Expanded(child: RaisedButton(
                     color: Theme.of(context).buttonColor,
@@ -155,7 +157,9 @@ class _FuelFormState extends State<FuelForm> {
                       'Reset',
                       // 'textScaleFactor' is used to change the text size
                       textScaleFactor: 1.5,
-                    ),),),
+                    ),
+                  ),
+                ),
               ],
             ),
 
@@ -194,6 +198,7 @@ class _FuelFormState extends State<FuelForm> {
     avgController.clear();
     priceController.clear();
     setState(() {
-      result = '';    });
+      result = '';
+    });
   }
 }
